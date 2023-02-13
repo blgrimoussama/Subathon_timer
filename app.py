@@ -310,5 +310,5 @@ def test():
 
 if __name__ == "__main__":
   app.secret_key = "your_secret_key"
-  app.run('0.0.0.0', 8081, debug=True)
+  app.run('0.0.0.0:$PORT', debug=True)
 

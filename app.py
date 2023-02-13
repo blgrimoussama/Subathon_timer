@@ -223,6 +223,7 @@ def streamlabs_callback():
 @app.get("/sse")
 @login_required
 def sse():
+  print('sse')
     try:
       user = validate(session["access_token"])
       user_id = user['user_id']

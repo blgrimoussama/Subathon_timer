@@ -221,7 +221,6 @@ def streamlabs_callback():
 
   
 @app.route("/sse")
-@login_required
 def sse():
     try:
       user = validate(session["access_token"])

@@ -153,7 +153,7 @@ def settings():
 
 @app.route("/callback")
 def callback():
-  print("callback")
+    print("callback")
     code = request.args.get('code')
     if not code:
       return 'Error: No code parameter in URL'

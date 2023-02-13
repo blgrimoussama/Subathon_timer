@@ -303,10 +303,9 @@ def timer():
 @login_required
 def test():
     def send_events():
-      while True:
-        event = ServerSentEvent("test", "test")
-        yield event.encode()
-        time.sleep(0.1)
+      event = ServerSentEvent("test", "test")
+      yield event.encode()
+      time.sleep(0.1)
     response = make_response(
         send_events(),
         {

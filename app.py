@@ -87,7 +87,6 @@ def loger_refresher(data):
 @app.route("/")
 @login_required
 def index():
-  print("index")
   access_token = session["access_token"]
   
   headers = {"Authorization": f"Bearer {access_token}", "Client-Id": CLIENT_ID}
@@ -154,7 +153,6 @@ def settings():
 
 @app.route("/callback")
 def callback():
-    print("callback")
     code = request.args.get('code')
     if not code:
       return 'Error: No code parameter in URL'
@@ -222,9 +220,9 @@ def streamlabs_callback():
     return redirect("/")
 
   
-@app.route("/sse")
+@app.get("/sse")
+@login_required
 def sse():
-    print('sse')
     try:
       user = validate(session["access_token"])
       user_id = user['user_id']
@@ -304,10 +302,21 @@ def timer():
 @app.route('/test')
 @login_required
 def test():
-    data = subathon_collection.find_one({'user_id': "689863647"})
-    data["deadline"] = 1674593901000
-    subathon_collection.replace_one({'user_id': "689863647"}, data, upsert=True)
-    return render_template('test.html')
+    def send_events():
+      while True:
+        event = ServerSentEvent("test", "test")
+        yield event.encode()
+        time.sleep(0.1)
+    response = make_response(
+        send_events(),
+        {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Transfer-Encoding': 'chunked',
+        },
+    )
+    response.timeout = None
+    return response
 
 
 if __name__ == "__main__":

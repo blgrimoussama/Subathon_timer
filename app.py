@@ -87,6 +87,7 @@ def loger_refresher(data):
 @app.route("/")
 @login_required
 def index():
+  print("index")
   access_token = session["access_token"]
   
   headers = {"Authorization": f"Bearer {access_token}", "Client-Id": CLIENT_ID}

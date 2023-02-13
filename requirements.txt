@@ -22,7 +22,6 @@ itsdangerous
 Jinja2
 MarkupSafe
 multidict
-numpy
 oauthlib
 Pillow
 pymongo

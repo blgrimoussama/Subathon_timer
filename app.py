@@ -7,6 +7,7 @@ from urllib.parse import urlencode
 from functools import wraps
 from dataclasses import dataclass
 from helpers import validate, refresh
+from werkzeug.serving import BaseWSGIServer
 from errors import *
 import json
 import time
@@ -319,6 +320,7 @@ def test():
 
 
 if __name__ == "__main__":
+  BaseWSGIServer.protocol_version = "HTTP/2"
   app.secret_key = "your_secret_key"
   app.run('0.0.0.0', 8081, debug=True)
 

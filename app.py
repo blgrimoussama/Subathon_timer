@@ -1,5 +1,5 @@
 from credentials import MONGODB_PASSWORD, CLIENT_ID, CLIENT_SECRET, STREAMLABS_CLIENT_ID, STREAMLABS_CLIENT_SECRET, REDIRECT_URI, STREAMLABS_REDIRECT_URI
-from flask import Flask, render_template, url_for, request, session, redirect, abort, make_response
+from flask import Response, Flask, render_template, url_for, request, session, redirect, abort, make_response
 from flask_oauthlib.client import OAuth
 from flask_cors import CORS
 from flask_wtf.csrf import CSRFProtect
@@ -7,7 +7,6 @@ from urllib.parse import urlencode
 from functools import wraps
 from dataclasses import dataclass
 from helpers import validate, refresh
-from werkzeug.serving import BaseWSGIServer
 from errors import *
 import json
 import time
@@ -276,19 +275,23 @@ def sse():
             for entry in ks:
               if old_timer is None or old_timer[entry] != timer[entry]:
                 old_timer = timer
-                print(timer)
+                print(entry, timer)
                 data = json.dumps(timer)
                 _event = entry
                 event = ServerSentEvent(data, _event)
                 yield event.encode()
             time.sleep(0.1)
-    response = make_response(
+    # response = make_response(
+    #     send_events(),
+    #     {
+    #         'Content-Type': 'text/event-stream',
+    #         'Cache-Control': 'no-cache',
+    #         'Transfer-Encoding': 'chunked',
+    #     },
+    # )
+    response = Response(
         send_events(),
-        {
-            'Content-Type': 'text/event-stream',
-            'Cache-Control': 'no-cache',
-            'Transfer-Encoding': 'chunked',
-        },
+        mimetype="text/event-stream",
     )
     response.timeout = None
     return response
@@ -315,12 +318,13 @@ def test():
             'Transfer-Encoding': 'chunked',
         },
     )
+    print(response.headers)
+    print(dir(response))
     response.timeout = None
     return response
 
 
 if __name__ == "__main__":
-  BaseWSGIServer.protocol_version = "HTTP/2"
   app.secret_key = "your_secret_key"
   app.run('0.0.0.0', 8081, debug=True)
 

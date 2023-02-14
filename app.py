@@ -116,9 +116,16 @@ def index():
     
   url = f"https://streamlabs.com/api/v1.0/authorize?{urlencode(parameters)}"
   
+  try:
+      if s := socket_tokens_collection.find_one({'user_id': session['id']}):
+        session['logged_in'] = True if s.get('socket_token') else False
+      else:
+          session['logged_in'] = False
+  except TypeError:
+    return redirect('/login')
   logged_in = session.get('logged_in')
 
-  logged_in = True if logged_in == True else False
+  logged_in = logged_in if logged_in else False
   
   return render_template('index.html', profile_img_url=profile_img_url, display_name=display_name, streamlabs_url=url, logged_in=logged_in)
 
@@ -272,14 +279,16 @@ def sse():
             ks = list(timer.keys())
             ks.remove('user_id')
             ks.remove('channel_name')
+            event_binary = b''
             for entry in ks:
               if old_timer is None or old_timer[entry] != timer[entry]:
-                old_timer = timer
-                print(entry, timer)
                 data = json.dumps(timer)
                 _event = entry
                 event = ServerSentEvent(data, _event)
-                yield event.encode()
+                event_binary += event.encode()
+            if event_binary:
+              old_timer = timer
+              yield event_binary
             time.sleep(0.1)
     # response = make_response(
     #     send_events(),

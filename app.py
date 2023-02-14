@@ -1,5 +1,5 @@
 from credentials import MONGODB_PASSWORD, CLIENT_ID, CLIENT_SECRET, STREAMLABS_CLIENT_ID, STREAMLABS_CLIENT_SECRET, REDIRECT_URI, STREAMLABS_REDIRECT_URI
-from flask import Response, Flask, render_template, url_for, request, session, redirect, abort, make_response
+from flask import Flask, Response, render_template, url_for, request, session, redirect, abort, make_response
 from flask_oauthlib.client import OAuth
 from flask_cors import CORS
 from flask_wtf.csrf import CSRFProtect

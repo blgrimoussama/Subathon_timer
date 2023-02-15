@@ -1,0 +1,96 @@
+form label,
+form input,
+form select {
+    margin: 1em;
+    height: 50%;
+    border-radius: 0.5em;
+}
+
+form div {
+    margin: 1em;
+    background-color: var(--primary-color);
+    border-radius: 1em;
+    height: 8vh;
+    align-items: center;
+    box-shadow: -4px -8px 4px var(--primary-color-light);
+    transition: var(--tran-5);
+}
+
+div input,
+div select {
+    background-color: var(--toggle-color);
+    color: var(--contrast-color);
+}
+
+label {
+    /* padding: 0.5% 0 0.5% 0; */
+    color: var(--text-color);
+    transition: var(--tran-3);
+    font-size: 3vh;
+}
+
+input[type=color] {
+    width: 5vw;
+    height: 6vh;
+    padding: 0;
+    border: none;
+    background-color: transparent;
+    cursor: pointer;
+}
+
+
+input[type=color]::-webkit-color-swatch {
+    border-radius: 0.5em;
+    border: none;
+}
+
+input[type=color]::-moz-color-swatch {
+    border-radius: 0.5em;
+    border: none;
+}
+
+
+body.dark form div {
+    box-shadow: none;
+}
+
+#font-settings {
+    opacity: 0;
+    position: absolute;
+    transition: var(--tran-3);
+    background-color: var(--primary-color-light);
+    border-radius: 1em 1em 0.5em 0.5em;
+}
+
+#font-settings form {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    /* background-color: var(--primary-color); */
+    border-radius: 1em;
+    /* height: 11vh; */
+    /* margin: 1em; */
+    transition: var(--tran-5);
+}
+
+#font-settings form div {
+    display: flex;
+    height: 3em;
+    /* background-color: var(--primary-color); */
+    border-radius: 1em;
+}
+
+header.top {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background-color: var(--sidebar-color);
+    color: var(--text-color);
+    transition: var(--tran-5);
+    border-radius: 1em;
+}
+
+header.top :is(i, h1) {
+    padding: 0 0.5em 0 .5em;
+}

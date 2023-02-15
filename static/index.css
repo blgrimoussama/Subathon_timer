@@ -390,14 +390,14 @@ body.dark .switch::before {
 }
 
 
-.sibling.sibling.timer-settings>.timer {
+.sibling.settings>.timer {
   position: absolute;
   top: 0;
   right: 0;
   padding: 1em;
 }
 
-.sibling.timer-settings>.timer>#timer {
+.sibling.settings>.timer>#timer {
   font-size: 2em;
 }
 

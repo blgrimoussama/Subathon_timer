@@ -1,11 +1,13 @@
 const body = document.querySelector('body')
 const sidebar = body.querySelector('.sidebar'),
-toggles = body.querySelectorAll('.toggle'),
-modeSwitch = body.querySelector('.toggle-switch'),
-modeText = body.querySelector('.mode-text'),
-mainPage = body.querySelector('.sibling'),
-TimerSettingsButton = body.querySelector('.timer-settings-button'),
-TimerButton = body.querySelector('.timer-button');
+    toggles = body.querySelectorAll('.toggle'),
+    modeSwitch = body.querySelector('.toggle-switch'),
+    modeText = body.querySelector('.mode-text'),
+    mainPage = body.querySelector('.sibling'),
+    TimerSettingsButton = body.querySelector('.timer-settings-button'),
+    TimerButton = body.querySelector('.timer-button'),
+    FontSettingsButton = body.querySelector('.font-settings-button'),
+    FontButton = body.querySelector('.font-button');
 
 
 toggles.forEach(toggle => {
@@ -27,15 +29,30 @@ modeSwitch.addEventListener('click', () => {
 });
 
 TimerSettingsButton.addEventListener('click', () => {
-    mainPage.classList = ['sibling timer-settings'];
+    mainPage.classList = ['sibling settings'];
+    hideTimerSiblings();
     s = mainPage.querySelector('#timer-settings').style
+    s.opacity = 1;
+    s.position = '';
+})
+
+FontSettingsButton.addEventListener('click', () => {
+    mainPage.classList = ['sibling settings'];
+    hideTimerSiblings();
+    s = mainPage.querySelector('#font-settings').style
     s.opacity = 1;
     s.position = '';
 })
 
 TimerButton.addEventListener('click', () => {
     mainPage.classList = ['sibling'];
-    s = mainPage.querySelector('#timer-settings').style
-    s.opacity = 0;
-    s.position = 'absolute';
+    hideTimerSiblings();
 })
+
+function hideTimerSiblings() {
+    let timerSiblings = mainPage.querySelectorAll('.timer-sibling');
+    timerSiblings.forEach(sibling => {
+        sibling.style.opacity = 0;
+        sibling.style.position = 'absolute';
+    })
+}

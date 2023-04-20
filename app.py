@@ -114,7 +114,7 @@ def index():
         'scope': 'socket.token'
     }
     
-  url = f"https://streamlabs.com/api/v1.0/authorize?{urlencode(parameters)}"
+  url = f"https://streamlabs.com/api/v2.0/authorize?{urlencode(parameters)}"
   
   try:
       if s := socket_tokens_collection.find_one({'user_id': session['id']}):

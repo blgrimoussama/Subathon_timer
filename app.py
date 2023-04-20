@@ -1,26 +1,24 @@
-# from credentials import MONGODB_URL, CLIENT_ID, CLIENT_SECRET, STREAMLABS_CLIENT_ID, STREAMLABS_CLIENT_SECRET, REDIRECT_URI, STREAMLABS_REDIRECT_URI
-from app.credentials import *
-from app.helpers import validate, refresh
-from app.errors import *
-from app.client import db_client
-from app.sse import ServerSentEvent
-from app import image_processing
-
-from flask import Flask, Response, render_template, url_for, request, session, redirect, abort, make_response, send_file
+from credentials import MONGODB_PASSWORD, CLIENT_ID, CLIENT_SECRET, STREAMLABS_CLIENT_ID, STREAMLABS_CLIENT_SECRET, REDIRECT_URI, STREAMLABS_REDIRECT_URI
+from flask import Flask, Response, render_template, url_for, request, session, redirect, abort, make_response
 from flask_oauthlib.client import OAuth
 from flask_cors import CORS
 from flask_wtf.csrf import CSRFProtect
 from urllib.parse import urlencode
 from functools import wraps
+from dataclasses import dataclass
+from helpers import validate, refresh
+from errors import *
 import json
 import time
 import requests
 import logging
+import pymongo
 
+# Connect to the MongoDB server
+client = pymongo.MongoClient(f"mongodb+srv://oussama:{MONGODB_PASSWORD}@cluster0.u8sz6ma.mongodb.net/?retryWrites=true&w=majority")
 
-
-db = db_client["mydatabase"]
-tokens_collection = db["twitch_tokens"]
+db = client["mydatabase"]
+tokens_collection = db["tokens"]
 socket_tokens_collection = db["socket_tokens"]
 subathon_collection = db["subathon"]
 
@@ -34,6 +32,24 @@ authorization_url = "https://id.twitch.tv/oauth2/authorize"
 token_url = "https://id.twitch.tv/oauth2/token"
 
 
+@dataclass
+class ServerSentEvent:
+    data: str
+    event: str = None
+    id: int = None
+    retry: int = None
+        
+    def encode(self) -> bytes:
+        message = f"data: {self.data}"
+        if self.event is not None:
+            message = f"{message}\nevent: {self.event}"
+        if self.id is not None:
+            message = f"{message}\nid: {self.id}"
+        if self.retry is not None:
+            message = f"{message}\nretry: {self.retry}"
+        message = f"{message}\r\n\r\n"
+        return message.encode('utf-8')
+  
 
 def login_required(func):
   @wraps(func)
@@ -71,7 +87,6 @@ def loger_refresher(data):
 @app.route("/")
 @login_required
 def index():
-  
   access_token = session["access_token"]
   
   headers = {"Authorization": f"Bearer {access_token}", "Client-Id": CLIENT_ID}
@@ -99,7 +114,7 @@ def index():
         'scope': 'socket.token'
     }
     
-  url = f"https://streamlabs.com/api/v2.0/authorize?{urlencode(parameters)}"
+  url = f"https://streamlabs.com/api/v1.0/authorize?{urlencode(parameters)}"
   
   try:
       if s := socket_tokens_collection.find_one({'user_id': session['id']}):
@@ -124,8 +139,7 @@ def login():
         'client_id': CLIENT_ID,
         'redirect_uri': REDIRECT_URI,
         'response_type': 'code',
-        'scope': 'user:read:email chat:read chat:edit',
-        'state': 'random_string'
+        'scope': 'user:read:email chat:read chat:edit'
     }
     
     url = f"https://id.twitch.tv/oauth2/authorize?{urlencode(parameters)}"
@@ -147,7 +161,6 @@ def settings():
 @app.route("/callback")
 def callback():
     code = request.args.get('code')
-    
     if not code:
       return 'Error: No code parameter in URL'
     data = {
@@ -159,12 +172,10 @@ def callback():
       }
     response = requests.post('https://id.twitch.tv/oauth2/token', data=data)
     
-    data = response.json()
-    print(data)
-    
+    data = response.json()      
+
     session = loger_refresher(data)
-    
-    print(session)
+
     try:
       if s := socket_tokens_collection.find_one({'user_id': session['id']}):
         if s.get('socket_token'):
@@ -173,7 +184,7 @@ def callback():
       return redirect('/login')
     
     # Redirect the user to the home page
-    return redirect("/") # if not redirect_uri else redirect(redirect_uri)
+    return redirect("/")
 
 
 @app.route("/streamlabs_callback")
@@ -188,17 +199,11 @@ def streamlabs_callback():
       'grant_type': 'authorization_code',
       'redirect_uri': STREAMLABS_REDIRECT_URI,
       }
+    response = requests.post('https://streamlabs.com/api/v1.0/token', data=data)
     
-    response = requests.post('https://streamlabs.com/api/v2.0/token', data=data)
-
-    data = response.json()
+    data = response.json()      
     
-    headers = {
-      "Authorization": f"Bearer {data['access_token']}",
-      "Accept": "application/json"
-      }
-
-    response = requests.get("https://streamlabs.com/api/v2.0/socket/token", headers=headers).json()
+    response = requests.get(f"https://streamlabs.com/api/v1.0/socket/token?access_token={data['access_token']}").json()
     
     if response.get('socket_token'):
       data['socket_token'] = response['socket_token']
@@ -240,8 +245,6 @@ def sse():
         abort(400)
     old_timer = None
 
-    
-    
     def send_events():
         nonlocal old_timer
         
@@ -284,7 +287,6 @@ def sse():
                 event = ServerSentEvent(data, _event)
                 event_binary += event.encode()
             if event_binary:
-              print("sending event", user_id)
               old_timer = timer
               yield event_binary
             time.sleep(0.1)
@@ -309,19 +311,6 @@ def sse():
 def timer():
     return render_template('timer.html')
 
-@app.route('/round_img')
-def round_img():
-  url = request.args.get('url')
-  if not url: return
-
-  img = image_processing.round_image(url)
-  
-  # Convert the processed image to a byte stream
-  byte_stream = image_processing.byte_streamer(img)
-
-  # Return the byte stream as a response
-  return send_file(byte_stream, mimetype='image/png')
-
 
 @app.route('/test')
 @login_required
@@ -343,11 +332,8 @@ def test():
     response.timeout = None
     return response
 
-@app.route("/testing")
-def testing():
-    return render_template("test.html")
 
 if __name__ == "__main__":
-  app.secret_key = "my_secret_key"
-  app.run('0.0.0.0', 8080, debug=True)
+  app.secret_key = "your_secret_key"
+  app.run('0.0.0.0', 8081, debug=True)
 

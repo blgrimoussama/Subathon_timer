@@ -199,11 +199,11 @@ def streamlabs_callback():
       'grant_type': 'authorization_code',
       'redirect_uri': STREAMLABS_REDIRECT_URI,
       }
-    response = requests.post('https://streamlabs.com/api/v1.0/token', data=data)
+    response = requests.post('https://streamlabs.com/api/v2.0/token', data=data)
     
     data = response.json()      
     
-    response = requests.get(f"https://streamlabs.com/api/v1.0/socket/token?access_token={data['access_token']}").json()
+    response = requests.get(f"https://streamlabs.com/api/v2.0/socket/token?access_token={data['access_token']}").json()
     
     if response.get('socket_token'):
       data['socket_token'] = response['socket_token']

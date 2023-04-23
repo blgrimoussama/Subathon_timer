@@ -1,4 +1,5 @@
 FROM python:3.11-alpine
+ADD repositories /etc/apk/repositories
 apk --no-cache add musl-dev linux-headers g++
 COPY . /application
 WORKDIR /application

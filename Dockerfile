@@ -4,4 +4,5 @@ COPY . /application
 WORKDIR /application
 RUN apk add g++ 
 RUN pip install -r requirements.txt
-CMD ["python", "main.py"]
+# CMD ["python", "main.py"]
+CMD ["gunicorn", "-b", "main:app"]

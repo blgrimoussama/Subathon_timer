@@ -14,8 +14,7 @@
 
 from app.app import app
 
-app = app
-
+app.secret_key = "my_secret_key_Br41N_F@c3"
 
 if __name__ == "__main__":
   app.secret_key = "my_secret_key_Br41N_F@c3"

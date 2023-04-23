@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Testing Page</title>
+</head>
+
+<body>
+  <div class="twitch-logo-container">
+    <figure class="logo">
+      <svg overflow="visible" width="40px" height="40px" version="1.1" viewBox="0 0 40 40" x="0px" y="0px"
+        class="svg-path">
+        <g>
+          <polygon points="13 8 8 13 8 31 14 31 14 36 19 31 23 31 32 22 32 8" class="back-path">
+          </polygon>
+          <polygon points="13 8 8 13 8 31 14 31 14 36 19 31 23 31 32 22 32 8" class="middle-path trans">
+          </polygon>
+          <polygon points="26 25 30 21 30 10 14 10 14 25 18 25 18 29 22 25" class="front-path">
+          </polygon>
+          <g class="eyes-path">
+            <path d="M20,14 L22,14 L22,20 L20,20 L20,14 Z M27,14 L27,20 L25,20 L25,14 L27,14 Z" id="eyes">
+            </path>
+          </g>
+        </g>
+      </svg>
+    </figure>
+  </div>
+  <style>
+    .twitch-logo-container {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .logo {
+      width: 100px;
+      height: 100px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .svg-path {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+    }
+
+    .back-path,
+    .middle-path {
+      fill: #6441a5;
+    }
+
+    .middle-path.trans {
+      transform: translate(3px, -3px);
+    }
+
+    .front-path {
+      fill: #ffffff;
+    }
+
+    .eyes-path {
+      fill: #6441a5;
+    }
+  </style>
+</body>
+
+</html>

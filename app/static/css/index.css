@@ -10,6 +10,7 @@
 :root {
   --body-color: #E4E9F7;
   --sidebar-color: #FFF;
+  --sidebar-contrast-color: var(--sidebar-color);
   /* --primary-color: #ffffff;
   --primary-color-light: #bce7f6; */
   --streamlabs-button-hover: #0b8e5e;
@@ -39,6 +40,7 @@ body.dark {
   --streamlabs-button: #0e533e;
   --streamlabs-button-hover: #58b79a;
   --sidebar-color: #242526;
+  --sidebar-contrast-color: var(--sidebar-color);
   --toggle-color: #DDD;
   --text-color: #CCC;
 
@@ -166,24 +168,6 @@ header .image-text .header-text {
   transform: translateY(-50%);
 }
 
-/* body.dark .sidebar header .toggle {
-  transform: rotate(180deg);
-  color: var(--text-color);
-} */
-
-/* .sidebar.close header .left {
-  opacity: 0;
-  transition: var(--tran-2);
-}
-
-.sidebar header .right {
-  opacity: 0;
-}
-
-.sidebar.close header .right {
-  opacity: 1;
-  transition: var(--tran-2);
-} */
 
 .sidebar li {
   margin-top: 0.8em;
@@ -274,8 +258,8 @@ body.connected .streamlabs-connect {
 
 .sidebar li a:hover .text,
 .sidebar li a:hover .icon {
-  color: var(--sidebar-color);
-  fill: var(--sidebar-color);
+  color: var(--sidebar-contrast-color);
+  fill: var(--sidebar-contrast-color);
 }
 
 .sidebar .menu-bar {

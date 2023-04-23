@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="/static/css/index.css">
+  <link rel="stylesheet" href="/static/css/browser_styles.css">
+  <link rel="stylesheet" href="/static/css/index - sections.css">
+  <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+  <title>Subathon Timer - {{display_name}}</title>
+  <link rel="icon" type="image/x-icon" href="/round_img?url={{profile_img_url}}" style="border-radius: 50%;">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/color-thief/2.3.0/color-thief.umd.js"></script>
+</head>
+
+
+<body class="dark {% if logged_in == true %} connected {% endif %}">
+  <script src="/static/scripts/colors.js"></script>
+  <nav class="sidebar">
+    <header>
+      <div class="image-text">
+        <span class="image">
+          <img class="profile-image" onload="getDominant(this.src)" src="{{ profile_img_url }}" alt="profile image">
+        </span>
+
+        <div class="text header-text">
+          <span class="name">{{ display_name }}</span>
+          <span class="role">Twitch Streamer</span>
+          <script>
+            function resize_to_fit(element) {
+              let fontSize = window.getComputedStyle(element).fontSize;
+              element.style.fontSize = (parseFloat(fontSize) - 1) + 'px';
+              if (element.clientHeight >= element.parentElement.clientHeight) {
+                resize_to_fit();
+              }
+            }
+
+            resize_to_fit(document.querySelector('.name'));
+          </script>
+        </div>
+      </div>
+      <i class="bx bx-chevron-right toggle"></i>
+    </header>
+    <div class="menu-bar">
+      <div class="streamlabs-connect">
+        <ul>
+          <li class="streamlabs-link">
+            <a class="streamlabs-button" href="{{ streamlabs_url }}">
+              <svg class="icon bx-streamlabs" data-v-7d802fce="" height="30" width="30" viewBox="0 0 35 35"
+                xmlns="http://www.w3.org/2000/svg">
+                <path data-v-7d802fce="" fill-rule="evenodd" clip-rule="evenodd"
+                  d="M6.82335 16.6233C6.82335 13.193 6.82335 11.4779 7.49093 10.1677C8.07816 9.01516 9.01516 8.07816 10.1677 7.49093C11.4779 6.82335 13.193 6.82335 16.6233 6.82335H21.5233C24.9537 6.82335 26.6688 6.82335 27.979 7.49093C29.1315 8.07816 30.0685 9.01516 30.6558 10.1677C31.3233 11.4779 31.3233 13.193 31.3233 16.6233V18.0233C31.3233 21.4537 31.3233 23.1688 30.6558 24.479C30.0685 25.6315 29.1315 26.5685 27.979 27.1558C26.6688 27.8233 24.9537 27.8233 21.5233 27.8233H12.4233C10.4632 27.8233 9.48307 27.8233 8.73438 27.4419C8.07581 27.1063 7.54038 26.5709 7.20483 25.9123C6.82335 25.1636 6.82335 24.1835 6.82335 22.2233V16.6233ZM15.5733 17.3233C15.5733 16.3568 16.3568 15.5733 17.3233 15.5733C18.2898 15.5733 19.0733 16.3568 19.0733 17.3233V20.8233C19.0733 21.7898 18.2898 22.5733 17.3233 22.5733C16.3568 22.5733 15.5733 21.7898 15.5733 20.8233V17.3233ZM24.3233 15.5733C23.3568 15.5733 22.5733 16.3568 22.5733 17.3233V20.8233C22.5733 21.7898 23.3568 22.5733 24.3233 22.5733C25.2898 22.5733 26.0733 21.7898 26.0733 20.8233V17.3233C26.0733 16.3568 25.2898 15.5733 24.3233 15.5733Z"
+                  class=""></path>
+                <path data-v-7d802fce="" fill-rule="evenodd" clip-rule="evenodd"
+                  d="M12.935 1.53422C13.0542 2.49333 12.3734 3.36753 11.4143 3.48681C10.8856 3.55255 10.4609 3.642 10.0849 3.75916C7.06497 4.7002 4.7002 7.06497 3.75916 10.0849C3.642 10.4609 3.55255 10.8856 3.48681 11.4143C3.36753 12.3734 2.49333 13.0542 1.53422 12.935C0.57511 12.8157 -0.105713 11.9415 0.0135597 10.9824C0.0992206 10.2936 0.226 9.6586 0.417636 9.04362C1.70087 4.92556 4.92556 1.70087 9.04362 0.417636C9.6586 0.226 10.2936 0.0992206 10.9824 0.0135597C11.9415 -0.105713 12.8157 0.57511 12.935 1.53422Z"
+                  class=""></path>
+              </svg>
+              <span class="text nav-text">Link Streamlabs</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="menu">
+        <ul class="menu-list">
+          <li class="nav-link">
+            <a class="timer-button">
+              <i class='bx bx-timer icon'></i>
+              <span class="text nav-text">Timer</span>
+            </a>
+          </li>
+          <li class="nav-link">
+            <a class="timer-settings-button">
+              <i class='bx bx-cog icon'></i>
+              <span class="text nav-text">Timer Settings</span>
+            </a>
+          </li>
+          <li class="nav-link">
+            <a class="add-time-button">
+              <i class='bx bxs-alarm-add icon'></i>
+              <span class="text nav-text">Add Time</span>
+            </a>
+          </li>
+          <li class="nav-link">
+            <a class="set-time-button">
+              <i class='bx bx-reset icon'></i>
+              <span class="text nav-text">Set Timer</span>
+            </a>
+          </li>
+          <li class="nav-link">
+            <a class="font-settings-button">
+              <i class='bx bx-font-family icon'></i>
+              <span class="text nav-text">Font Settings</span>
+            </a>
+          </li>
+          <li class="nav-link">
+            <a class="about-button">
+              <i class='bx bx-info-circle icon'></i>
+              <span class="text nav-text">About</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+      <div class="bottom-content">
+        <ul>
+          <li class="">
+            <a class="logout-button">
+              <i class='bx bx-log-out icon'></i>
+              <span class="text nav-text">Log Out</span>
+            </a>
+          </li>
+          <li class="mode">
+            <div class="moon-sun">
+              <i class='bx bx-moon icon'></i>
+              <i class='bx bx-sun icon'></i>
+            </div>
+            <span class="mode-text text">Light Mode</span>
+            <div class="toggle-switch">
+              <span class="switch"></span>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+  <section class="sibling">
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class=flashes>
+      {% for message in messages %}
+      <li>{{ message }}</li>
+      {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+    <div class="timer">
+      <div class="text">Subathon Timer:</div>
+      <div id="timer"></div>
+
+      <!-- Add the JavaScript to handle the timer and input bar -->
+      <script src="/static/scripts/timer.js"></script>
+    </div>
+    <div class="timer-sibling" id="timer-settings">
+    </div>
+    <div class="timer-sibling" id="font-settings">
+      <header class="top">
+        <i class="bx bx-slider-alt icon"></i>
+        <h1>Font Settings</h1>
+      </header>
+      <form>
+        <div>
+          <label>Color:</label>
+          <input type="color" id="colorInput" title="color Input" value="black">
+
+          <label>Font Family:</label>
+          <select id="fontFamilyInput" title="fontFamily Input">
+            <option value="Arial">Arial</option>
+            <option value="Verdana">Verdana</option>
+            <option value="Helvetica">Helvetica</option>
+            <option value="Tahoma">Tahoma</option>
+          </select>
+        </div>
+        <div>
+          <label>Font Size:</label>
+          <input type="number" id="fontSizeInput" value="100" min="50" max="999" title="fontSize Input">
+        </div>
+        <div>
+          <label>Font Size :</label>
+          <input type="range" id="fontSizeInputSlidert" title="fontSize Input" min="50" max="999">
+        </div>
+      </form>
+    </div>
+  </section>
+  <script src="/static/scripts/index.js"></script>
+</body>
+
+</html>

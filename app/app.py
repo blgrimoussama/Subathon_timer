@@ -1,28 +1,28 @@
-# from credentials import MONGODB_URL, CLIENT_ID, CLIENT_SECRET, STREAMLABS_CLIENT_ID, STREAMLABS_CLIENT_SECRET, REDIRECT_URI, STREAMLABS_REDIRECT_URI
-from app.credentials import *
-from app.helpers import validate, refresh
-from app.errors import *
-from app.client import db_client
-from app.sse import ServerSentEvent
-from app import image_processing
-
-from flask import Flask, Response, render_template, flash, url_for, request, session, redirect, abort, make_response, send_file
-from flask_oauthlib.client import OAuth
-from flask_cors import CORS
-from flask_wtf.csrf import CSRFProtect
-from urllib.parse import urlencode
-from functools import wraps
 import json
-import time
-import requests
 import logging
+import time
+from functools import wraps
+from urllib.parse import urlencode
 
+import requests
+from flask import (Flask, Response, abort, flash, make_response, redirect,
+                   render_template, request, send_file, session, url_for)
+from flask_cors import CORS
+from flask_oauthlib.client import OAuth
+from flask_wtf.csrf import CSRFProtect
 
+# from credentials import MONGODB_URL, CLIENT_ID, CLIENT_SECRET, STREAMLABS_CLIENT_ID, STREAMLABS_CLIENT_SECRET, REDIRECT_URI, STREAMLABS_REDIRECT_URI
+from app import image_processing
+from app.client import db_client
+from app.credentials import *
+from app.errors import *
+from app.helpers import refresh, validate
+from app.sse import ServerSentEvent
 
-db = db_client["mydatabase"]
-tokens_collection = db["twitch_tokens"]
-socket_tokens_collection = db["socket_tokens"]
-subathon_collection = db["subathon"]
+db = db_client[DB_NAME]
+tokens_collection = db[TWITCH_TOKENS_COLLECTION]
+socket_tokens_collection = db[STREAMLABS_SOCKET_TOKENS_COLLECTION]
+subathon_collection = db[SUBATHON_COLLECTION]
 
 app = Flask(__name__)
 CORS(app, allow_origin="*")
@@ -30,8 +30,8 @@ csrf = CSRFProtect(app)
 oauth = OAuth(app)
 
 # Set the authorization URL and token URL
-authorization_url = "https://id.twitch.tv/oauth2/authorize"
-token_url = "https://id.twitch.tv/oauth2/token"
+authorization_url = TWITCH_AUTHORIZATION_URL
+token_url = TWITCH_TOKEN_URL
 
 
 
@@ -47,13 +47,13 @@ def login_required(func):
   return wrapper
 
 
-def loger_refresher(data):
+def logger_refresher(data):
     try:
         user_id = validate(data['access_token'])['user_id']
     except (ValidationError, KeyError):
         return redirect("/login"), 401
     
-    data['user_id'] = user_id
+    data['_id'] = data['user_id'] = user_id
     
     if not tokens_collection.find_one({'user_id': user_id}):
         tokens_collection.insert_one(data)
@@ -79,14 +79,14 @@ def index():
   parameters = {"user_id": session["id"]}
   
   try:
-    r = requests.get("https://api.twitch.tv/helix/users", headers=headers, params=parameters)
+    r = requests.get(TWITCH_API['users'], headers=headers, params=parameters)
 
     profile_img_url = r.json()['data'][0]['profile_image_url']
     display_name = r.json()['data'][0]['display_name']
   except (KeyError, IndexError):
     data = refresh(session["refresh_token"])
     if data.get('access_token'):
-      for ele in loger_refresher(data).items():
+      for ele in logger_refresher(data).items():
         session[ele[0]] = ele[1]
       return redirect('/')
     else:
@@ -99,13 +99,13 @@ def index():
         'scope': 'socket.token'
     }
     
-  url = f"https://streamlabs.com/api/v2.0/authorize?{urlencode(parameters)}"
+  url = f"{STREAMLABS_AUTHORIZATION_URL}?{urlencode(parameters)}"
   
   try:
-      if s := socket_tokens_collection.find_one({'user_id': session['id']}):
-        session['logged_in'] = True if s.get('socket_token') else False
-      else:
-          session['logged_in'] = False
+    if s := socket_tokens_collection.find_one({'user_id': session['id']}):
+      session['logged_in'] = True if s.get('socket_token') else False
+    else:
+      session['logged_in'] = False
   except TypeError:
     return redirect('/login')
   logged_in = session.get('logged_in')
@@ -124,11 +124,11 @@ def login():
         'client_id': CLIENT_ID,
         'redirect_uri': REDIRECT_URI,
         'response_type': 'code',
-        'scope': 'user:read:email chat:read chat:edit',
+        'scope': LOGIN_SCOPES,
         'state': 'random_string'
     }
     
-    url = f"https://id.twitch.tv/oauth2/authorize?{urlencode(parameters)}"
+    url = f"{TWITCH_AUTHORIZATION_URL}?{urlencode(parameters)}"
     return render_template('login.html', login_url=url)
 
 
@@ -157,12 +157,12 @@ def callback():
       'grant_type': 'authorization_code',
       'redirect_uri': REDIRECT_URI,
       }
-    response = requests.post('https://id.twitch.tv/oauth2/token', data=data)
+    response = requests.post(TWITCH_TOKEN_URL, data=data)
     
     data = response.json()
     print(data)
     
-    session = loger_refresher(data)
+    session = logger_refresher(data)
     
     print(session)
     try:
@@ -191,7 +191,7 @@ def streamlabs_callback():
       'redirect_uri': STREAMLABS_REDIRECT_URI,
       }
     
-    response = requests.post('https://streamlabs.com/api/v2.0/token', data=data)
+    response = requests.post(STREAMLABS_TOKEN_URL, data=data)
 
     data = response.json()
     
@@ -204,7 +204,7 @@ def streamlabs_callback():
       "Accept": "application/json"
       }
 
-    response = requests.get("https://streamlabs.com/api/v2.0/socket/token", headers=headers).json()
+    response = requests.get(STREAMLABS_SOKET_TOKEN_URL, headers=headers).json()
     if isinstance(response, str):
       # return response, {"Refresh": "1; url=/"}
       print(response)
@@ -222,7 +222,7 @@ def streamlabs_callback():
     else:
       return redirect('/login')
     
-    data.update({'user_id': user_id, "working": True})
+    data.update({'_id': user_id, 'user_id': user_id, "working": True})
         
     session["logged_in"] = True
     
@@ -259,9 +259,10 @@ def sse():
         
         while True:
             if not subathon_collection.find_one({'user_id': user_id}):
-              timer = {'deadline': 0,
-                      'precision': 'seconds',
+              timer = {'deadline': DEFAULT_DEADLINE,
+                      'precision': 'ms',
                       'format': 'hh:mm:ss', # or dd:hh:mm:ss
+                      '_id': user_id,
                       'user_id': user_id,
                       'channel_name': channel_name,
                       'font_family': 'Arial',
@@ -270,7 +271,7 @@ def sse():
                       'background_color': '', # no fill
                       'added_time_color': '#00ff00', # green
                       'removed_time_color': '#ffff00', # yellow
-                      'donaton' : {
+                      'donation' : {
                         'multiplier': 100,
                       },
                       'bits': {

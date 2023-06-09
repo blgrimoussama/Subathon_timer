@@ -13,7 +13,7 @@
 #   app.run(host='0.0.0.0', port=8080, debug=True)
 
 from app.app import app
-from app.cridentials import APP_SECRET_KEY
+from app.credentials import APP_SECRET_KEY
 
 if __name__ == "__main__":
   app.secret_key = APP_SECRET_KEY

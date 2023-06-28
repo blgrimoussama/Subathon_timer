@@ -55,10 +55,10 @@ def logger_refresher(data):
     
     data['_id'] = data['user_id'] = user_id
     
-    if not tokens_collection.find_one({'user_id': user_id}):
+    if not tokens_collection.find_one({'_id': user_id}):
         tokens_collection.insert_one(data)
     else:
-        tokens_collection.replace_one({'user_id': user_id}, data, upsert=True)
+        tokens_collection.update_one({'_id': user_id}, {"$set": data}, upsert=True)
     # data = tokens_collection.find_one({'user_id': user_id})
     # del data['_id']
     # Save the access token and refresh token in the session

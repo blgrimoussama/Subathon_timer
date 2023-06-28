@@ -41,5 +41,5 @@ def refresh(refresh_token):
     return refreshment
 
 if __name__ == '__main__':
-    token = refresh('r6lw421dm5m9t7f154gwttdd01lkzzxhlukxmzy9xnvmnwbnsm')['access_token']
+    token = refresh('...')['access_token']
     print(validate(token))

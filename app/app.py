@@ -301,18 +301,20 @@ def sse():
               old_timer = timer
               yield event_binary
             time.sleep(0.1)
-    # response = make_response(
-    #     send_events(),
-    #     {
-    #         'Content-Type': 'text/event-stream',
-    #         'Cache-Control': 'no-cache',
-    #         'Transfer-Encoding': 'chunked',
-    #     },
-    # )
-    response = Response(
+    response = make_response(
         send_events(),
-        mimetype="text/event-stream",
+        {
+            'Content-Type': 'text/event-stream',
+            'Cache-Control': 'no-cache',
+            'Transfer-Encoding': 'chunked',
+            'Connection': 'keep-alive'
+        },
     )
+    # response = Response(
+    #     send_events(),
+    #     mimetype="text/event-stream",
+    #     connection="keep-alive"
+    # )
     response.timeout = None
     return response
 

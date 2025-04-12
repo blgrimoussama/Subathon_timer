@@ -35,7 +35,7 @@
   <script src="/static/scripts/timer.js"></script>
   <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js' type='text/javascript'></script>
 <script type = 'text/javascript'>
-  const socketToken = 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ0b2tlbiI6Ijc4MDA5NzVFMkEyQ0NDOTVBODJGQTZDNDFGMEU2OTRBOTkzRUZDQzM4OEM0NjRGNjUyNjhFRTVGM0M5Rjg2NjhFNTYxOTM4NEMwOTE4MEVCREQ4RTBDQkM4OTU5NjdFOURCMzA3MTc2MzY1NEFCMzVEQUI3QkUwNkIzOTdFOEJCNTU5RTQ2NjE2NTEwNEQ0RTcwNEEwQTg5Q0REQjA2RUNDMDg2NzgwQ0VEQ0JBMTkxODk3REFGNjY2NUNCRDY4Q0Q0QURERjI3NkMxQ0YyMzk3NTcyRTNCMDYzNDU3QzUyQTM4NDg4MzkzMUMxNjA3MzNCRDUzRkYzQzgiLCJyZWFkX29ubHkiOnRydWUsInByZXZlbnRfbWFzdGVyIjp0cnVlLCJ0d2l0Y2hfaWQiOiI0MzY1MTY5NjMifQ.icq3w4MRXwIGVHCr-r7yAuV6Xz5nuI9UzFY-0hindsI'; //Socket token from /socket/token end point
+  const socketToken = '...'; //Socket token from /socket/token end point
   
   //Connect to socket
 const streamlabs = io(`https://sockets.streamlabs.com?token=${socketToken}`, {transports: ['websocket']});
